@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CounterService } from 'src/app/api/controllers/Counter';
+// import { CounterService } from 'src/app/api/controllers/Counter';
 
 @Component({
   selector: 'app-add-product',
@@ -7,9 +7,9 @@ import { CounterService } from 'src/app/api/controllers/Counter';
   styleUrls: ['./add-product.component.sass']
 })
 export class AddProductComponent implements OnInit {
-pID: number;
-  constructor(private cs : CounterService) {
-    this.pID = cs.pId.;
+pID: number =5;
+  constructor() {
+    // this.pID = cs.pId.;
    }
 
   ngOnInit(): void {
