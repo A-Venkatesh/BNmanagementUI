@@ -1,8 +1,9 @@
 // import { Component, OnInit } from '@angular/core';
-import {AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatSort, MatSortable} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import { AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort, MatSortable } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 import { OrderService } from 'src/app/api/controllers/Order';
 import { Order } from 'src/app/api/model';
 
@@ -22,38 +23,42 @@ import { Order } from 'src/app/api/model';
 //   'Isabella', 'Jasper', 'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'
 // ];
 
-
 @Component({
   selector: 'app-orders-list',
   templateUrl: './orders-list.component.html',
   styleUrls: ['./orders-list.component.sass'],
   providers: [OrderService],
 })
-export class OrdersListComponent  implements AfterViewInit {
-  displayedColumns: string[] = ['postedOn','id', 'status', 'fullName', 'amount'];
+export class OrdersListComponent implements AfterViewInit {
+  displayedColumns: string[] = [
+    'postedOn',
+    'id',
+    'status',
+    'fullName',
+    'amount',
+  ];
   dataSource: MatTableDataSource<Order>;
-  users!: Order[];
-  // users!: import("d:/NB/BNmanagementUI/src/app/api/model").Order[];
-  // const users = [] ;
-  constructor( os: OrderService) {
-    // const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
-console.log("consy");
-this.users=[];
-    os.getOrdersUsingGET()
-      .subscribe(arg => {
-        // console.log(JSON.stringify(arg[0].id));
+  data!: Order[];
+  // data!: import("d:/NB/BNmanagementUI/src/app/api/model").Order[];
+  // const data = [] ;
+  constructor(os: OrderService) {
+    // const data = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
+    console.log('consy');
+    this.data = [];
+    os.getOrdersUsingGET().subscribe((arg) => {
+      // console.log(JSON.stringify(arg[0].id));
 
-        this.users = arg
-        this.dataSource = new MatTableDataSource(this.users);
-       this.ngAfterViewInit();
-      });
+      this.data = arg;
+      this.dataSource = new MatTableDataSource(this.data);
+      this.ngAfterViewInit();
 
-    // Create 100 users
-    this.dataSource = new MatTableDataSource(this.users);
+      this.tabClick(0);
+    });
 
+    // Create 100 data
+    this.dataSource = new MatTableDataSource(this.data);
 
     // Assign the data to the data source for the table to render
-
   }
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
@@ -62,17 +67,22 @@ this.users=[];
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
 
-    this.dataSource.sortingDataAccessor = (item:Order, property) => {
-      switch(property) {
-        case 'fullName': return item.userDetails.fullName;
-        case 'id': return item.id;
-        case 'status': return item.status;
-        case 'amount': return Number(item.invoice.amount);
-        case 'postedOn': return new Date(item.postedOn != undefined ?item.postedOn:'' ) ;
+    this.dataSource.sortingDataAccessor = (item: Order, property) => {
+      switch (property) {
+        case 'fullName':
+          return item.userDetails.fullName;
+        case 'id':
+          return item.id;
+        case 'status':
+          return item.status;
+        case 'amount':
+          return Number(item.invoice.amount);
+        case 'postedOn':
+          return new Date(item.postedOn != undefined ? item.postedOn : '');
         // default: return item[property];
       }
     };
-    this.sort.sort(({ id: 'postedOn', start: 'asc'}) as MatSortable);
+    this.sort.sort({ id: 'postedOn', start: 'asc' } as MatSortable);
     // this.dataSource.sort = sort;
     this.dataSource.sort = this.sort;
   }
@@ -80,14 +90,61 @@ this.users=[];
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
 
-    this.dataSource.filter = filterValue.trim().toLowerCase();
     this.dataSource.filterPredicate = (data: any, filter) => {
-      const dataStr =JSON.stringify(data).toLowerCase();
+      const dataStr = JSON.stringify(data).toLowerCase();
       return dataStr.indexOf(filter) != -1;
-    }
+    };
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+  tabClicked(tab: MatTabChangeEvent){
+this.tabClick(tab.index);
+  }
+
+  tabClick(tab: Number) {
+    console.log(tab);
+
+    switch (tab) {
+      case 2:
+        // let data =  this.data;
+        this.dataSource = new MatTableDataSource(this.data);
+        this.ngAfterViewInit();
+        break;
+      case 0:
+     this.tabData('RECEIVED');
+        //  this.ngAfterViewInit();
+        break;
+
+      case 1:
+        this.tabData('DISPACHED');
+        //  this.ngAfterViewInit();
+        break;
+
+      default:
+        break;
+    }
+  }
+  tabData(status:any){
+
+    this.dataSource.data = this.data;
+
+    this.dataSource.filterPredicate = (data: Order, filter) => {
+      // const dataStr = JSON.stringify(data).toLowerCase();
+      return data.status == filter;
+    };
+    this.dataSource.filter = status;
+    this.dataSource.data = this.dataSource.filteredData;
+
+    // let data = this.data.filter((a) => a.status?.match(status));
+    // this.dataSource = new MatTableDataSource(data);
+    // console.log(JSON.stringify(data));
+
+    // // this.ngAfterViewInit();
+    // this.dataSource.paginator = this.paginator;
+    // this.dataSource.filterPredicate  =  (data: Element, filter: string) => data.name.indexOf(filter) != -1;
   }
 }
 
