@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { OrderService } from 'src/app/api/controllers/Order';
 import { Order } from 'src/app/api/model';
+import { DataService } from 'src/app/Services/data.service';
 
 // export interface UserData {
 //   id: string;
@@ -36,12 +37,13 @@ export class OrdersListComponent implements AfterViewInit {
     'status',
     'fullName',
     'amount',
+    'action',
   ];
   dataSource: MatTableDataSource<Order>;
   data!: Order[];
   // data!: import("d:/NB/BNmanagementUI/src/app/api/model").Order[];
   // const data = [] ;
-  constructor(os: OrderService) {
+  constructor(os: OrderService, ds:DataService) {
     // const data = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
     console.log('consy');
     this.data = [];
@@ -53,6 +55,7 @@ export class OrdersListComponent implements AfterViewInit {
       this.ngAfterViewInit();
 
       this.tabClick(0);
+      ds.orders = arg;
     });
 
     // Create 100 data

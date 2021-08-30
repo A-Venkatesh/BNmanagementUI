@@ -8,19 +8,25 @@ import { AddProductComponent } from './Components/add-product/add-product.compon
 import { NoPageFoundComponent } from './Components/no-page-found/no-page-found.component';
 import { AngularMaterialModule } from './Modules/angular-material.module';
 import { OrdersListComponent } from './Components/orders-list/orders-list.component';
+import { HttpClientModule } from '@angular/common/http';
+import { PrimengMaterialModule } from './Modules/primeng-material.module';
+import { OrderDetailComponent } from './Components/order-detail/order-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AddProductComponent,
     NoPageFoundComponent,
-    OrdersListComponent
+    OrdersListComponent,
+    OrderDetailComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    AngularMaterialModule
+    AngularMaterialModule,
+    PrimengMaterialModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
