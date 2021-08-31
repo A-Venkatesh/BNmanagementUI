@@ -11,6 +11,8 @@ import { OrdersListComponent } from './Components/orders-list/orders-list.compon
 import { HttpClientModule } from '@angular/common/http';
 import { PrimengMaterialModule } from './Modules/primeng-material.module';
 import { OrderDetailComponent } from './Components/order-detail/order-detail.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,10 @@ import { OrderDetailComponent } from './Components/order-detail/order-detail.com
     BrowserAnimationsModule,
     AngularMaterialModule,
     PrimengMaterialModule,
-    HttpClientModule
+    FlexLayoutModule,
+    HttpClientModule,
+    NgbModule,
+
   ],
   providers: [],
   bootstrap: [AppComponent]
