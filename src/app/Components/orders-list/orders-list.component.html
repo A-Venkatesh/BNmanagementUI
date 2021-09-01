@@ -1,3 +1,6 @@
+<!-- <div [innerHTML]="t2p.content"></div> -->
+<button (click)="printComponent('component1')">Print</button>{{printB}}
+<div [hidden]="printB" [innerHtml]="t2p.content | innerHTML" id="component1"></div>
 <mat-tab-group (selectedTabChange)="tabClicked($event)">
   <mat-tab>
     <ng-template mat-tab-label>
@@ -77,7 +80,7 @@
 
           <ul>
             <li>
-
+<button (click) ="t2p.readData()"> Download</button>
             </li>
             <li>Tea</li>
             <li>Milk</li>

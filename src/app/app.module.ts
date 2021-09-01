@@ -13,6 +13,7 @@ import { PrimengMaterialModule } from './Modules/primeng-material.module';
 import { OrderDetailComponent } from './Components/order-detail/order-detail.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { InnerHTMLPipe } from './Components/orders-list/inner-html.pipe';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     AddProductComponent,
     NoPageFoundComponent,
     OrdersListComponent,
-    OrderDetailComponent
+    OrderDetailComponent,
+    InnerHTMLPipe
   ],
   imports: [
     BrowserModule,

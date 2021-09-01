@@ -1,5 +1,5 @@
 // import { Component, OnInit } from '@angular/core';
-import { AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, OnInit, ElementRef, Pipe } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -7,6 +7,7 @@ import { MatTabChangeEvent } from '@angular/material/tabs';
 import { OrderService } from 'src/app/api/controllers/Order';
 import { Order } from 'src/app/api/model';
 import { DataService } from 'src/app/Services/data.service';
+import { TextToPdfService } from 'src/app/Services/text-to-pdf.service';
 
 // export interface UserData {
 //   id: string;
@@ -30,7 +31,18 @@ import { DataService } from 'src/app/Services/data.service';
   styleUrls: ['./orders-list.component.sass'],
   providers: [OrderService],
 })
+
+
 export class OrdersListComponent implements AfterViewInit {
+  printB= true;
+  @ViewChild('dataContainer')
+  dataContainer!: ElementRef;
+
+  loadData(data:string) {
+    console.log('load data methord');
+
+      this.dataContainer.nativeElement.innerHTML = data;
+  }
   displayedColumns: string[] = [
     'postedOn',
     'id',
@@ -43,8 +55,11 @@ export class OrdersListComponent implements AfterViewInit {
   data!: Order[];
   // data!: import("d:/NB/BNmanagementUI/src/app/api/model").Order[];
   // const data = [] ;
-  constructor(os: OrderService, ds:DataService) {
+  constructor(os: OrderService, ds:DataService, public t2p:TextToPdfService) {
     // const data = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
+    console.log(t2p.content);
+    // this.loadData(t2p.content) ;
+
     console.log('consy');
     this.data = [];
     os.getOrdersUsingGET().subscribe((arg) => {
@@ -149,7 +164,25 @@ this.tabClick(tab.index);
     // this.dataSource.paginator = this.paginator;
     // this.dataSource.filterPredicate  =  (data: Element, filter: string) => data.name.indexOf(filter) != -1;
   }
+  async printComponent(cmpName: any) {
+    this.printB = false;
+    await new Promise(f => setTimeout(f, 1000));
+    console.log('pcccccccccc');
+
+    this.t2p.captureScreen();
+    // let printContents = document.getElementById(cmpName)!.innerHTML;
+    // let originalContents = document.body.innerHTML;
+
+    // document.body.innerHTML = printContents;
+
+    // window.print();
+
+    // document.body.innerHTML = originalContents;
+    // window.location.reload();
+     this.printB = true;
 }
+}
+
 
 /** Builds and returns a new User. */
 // function createNewUser(id: number): UserData {
