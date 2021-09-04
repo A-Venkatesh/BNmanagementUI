@@ -13,7 +13,7 @@ import { PrimengMaterialModule } from './Modules/primeng-material.module';
 import { OrderDetailComponent } from './Components/order-detail/order-detail.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import { InnerHTMLPipe } from './Components/orders-list/inner-html.pipe';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,6 @@ import { InnerHTMLPipe } from './Components/orders-list/inner-html.pipe';
     NoPageFoundComponent,
     OrdersListComponent,
     OrderDetailComponent,
-    InnerHTMLPipe
   ],
   imports: [
     BrowserModule,
@@ -33,6 +32,7 @@ import { InnerHTMLPipe } from './Components/orders-list/inner-html.pipe';
     FlexLayoutModule,
     HttpClientModule,
     NgbModule,
+    FormsModule,
 
   ],
   providers: [],

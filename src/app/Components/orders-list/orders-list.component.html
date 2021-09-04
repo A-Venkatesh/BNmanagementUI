@@ -1,6 +1,6 @@
 <!-- <div [innerHTML]="t2p.content"></div> -->
-<button (click)="printComponent('component1')">Print</button>{{printB}}
-<div [hidden]="printB" [innerHtml]="t2p.content | innerHTML" id="component1"></div>
+<!-- <button (click)="printComponent('component1')">Print</button>{{printB}} -->
+<!-- {{selectedPerson}} -->
 <mat-tab-group (selectedTabChange)="tabClicked($event)">
   <mat-tab>
     <ng-template mat-tab-label>
@@ -24,7 +24,13 @@
     </ng-template>
 
   </mat-tab>
-
+  <mat-tab disabled>
+    <ng-template mat-tab-label>
+        <button mat-icon-button (click)="printComponent('multiple')">
+          <mat-icon>cloud_download</mat-icon>
+        </button>
+    </ng-template>
+</mat-tab>
 </mat-tab-group>
 
 
@@ -40,6 +46,21 @@
 
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort >
+
+      <ng-container matColumnDef="radio">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
       <!-- postedOn -->
       <ng-container matColumnDef="postedOn">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
@@ -71,20 +92,18 @@
       <!-- Fruit Column -->
       <ng-container matColumnDef="amount">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
-        <td mat-cell *matCellDef="let row"> {{row.invoice.amount / 100}} </td>
+        <td mat-cell *matCellDef="let row"> {{row.invoice.amount / 100 | currency: "INR":"symbol"}} </td>
       </ng-container>
 
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Action </th>
         <td mat-cell *matCellDef="let row">
 
-          <ul>
-            <li>
-<button (click) ="t2p.readData()"> Download</button>
-            </li>
-            <li>Tea</li>
-            <li>Milk</li>
-          </ul>
+
+              <button (click)="printComponent(row)" mat-icon-button color="primary" aria-label="Example icon button with a menu icon">
+                <mat-icon>picture_as_pdf</mat-icon>
+              </button>
+
         </td>
       </ng-container>
 
@@ -114,5 +133,4 @@
     <mat-paginator [pageSizeOptions]="[10, 20, 40, 100]" aria-label="Select page of users"></mat-paginator>
   </div>
 </ng-template>
-
 

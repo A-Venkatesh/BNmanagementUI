@@ -1,49 +1,35 @@
 // import { Component, OnInit } from '@angular/core';
-import { AfterViewInit, Component, ViewChild, OnInit, ElementRef, Pipe } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
+import {
+  AfterViewInit,
+  Component,
+  ViewChild,
+  OnInit,
+  ElementRef,
+  Pipe,
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { OrderService } from 'src/app/api/controllers/Order';
+import { PdfService } from 'src/app/api/controllers/Pdf';
 import { Order } from 'src/app/api/model';
 import { DataService } from 'src/app/Services/data.service';
-import { TextToPdfService } from 'src/app/Services/text-to-pdf.service';
-
-// export interface UserData {
-//   id: string;
-//   name: string;
-//   progress: string;
-//   fruit: string;
-// }
-
-/** Constants used to fill up our data base. */
-// const FRUITS: string[] = [
-//   'blueberry', 'lychee', 'kiwi', 'mango', 'peach', 'lime', 'pomegranate', 'pineapple'
-// ];
-// const NAMES: string[] = [
-//   'Maia', 'Asher', 'Olivia', 'Atticus', 'Amelia', 'Jack', 'Charlotte', 'Theodore', 'Isla', 'Oliver',
-//   'Isabella', 'Jasper', 'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'
-// ];
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-orders-list',
   templateUrl: './orders-list.component.html',
   styleUrls: ['./orders-list.component.sass'],
-  providers: [OrderService],
+  providers: [OrderService, PdfService],
 })
-
-
 export class OrdersListComponent implements AfterViewInit {
-  printB= true;
-  @ViewChild('dataContainer')
-  dataContainer!: ElementRef;
-
-  loadData(data:string) {
-    console.log('load data methord');
-
-      this.dataContainer.nativeElement.innerHTML = data;
-  }
+  // printB = true;
+  // printC = '';
+  selection = new SelectionModel<Order>(true, []);
   displayedColumns: string[] = [
+    'radio',
     'postedOn',
     'id',
     'status',
@@ -53,17 +39,11 @@ export class OrdersListComponent implements AfterViewInit {
   ];
   dataSource: MatTableDataSource<Order>;
   data!: Order[];
-  // data!: import("d:/NB/BNmanagementUI/src/app/api/model").Order[];
-  // const data = [] ;
-  constructor(os: OrderService, ds:DataService, public t2p:TextToPdfService) {
-    // const data = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
-    console.log(t2p.content);
-    // this.loadData(t2p.content) ;
 
+  constructor(os: OrderService, ds: DataService, public pdf: PdfService) {
     console.log('consy');
     this.data = [];
     os.getOrdersUsingGET().subscribe((arg) => {
-      // console.log(JSON.stringify(arg[0].id));
 
       this.data = arg;
       this.dataSource = new MatTableDataSource(this.data);
@@ -118,8 +98,8 @@ export class OrdersListComponent implements AfterViewInit {
       this.dataSource.paginator.firstPage();
     }
   }
-  tabClicked(tab: MatTabChangeEvent){
-this.tabClick(tab.index);
+  tabClicked(tab: MatTabChangeEvent) {
+    this.tabClick(tab.index);
   }
 
   tabClick(tab: Number) {
@@ -132,7 +112,7 @@ this.tabClick(tab.index);
         this.ngAfterViewInit();
         break;
       case 0:
-     this.tabData('RECEIVED');
+        this.tabData('RECEIVED');
         //  this.ngAfterViewInit();
         break;
 
@@ -145,8 +125,7 @@ this.tabClick(tab.index);
         break;
     }
   }
-  tabData(status:any){
-
+  tabData(status: any) {
     this.dataSource.data = this.data;
 
     this.dataSource.filterPredicate = (data: Order, filter) => {
@@ -164,35 +143,49 @@ this.tabClick(tab.index);
     // this.dataSource.paginator = this.paginator;
     // this.dataSource.filterPredicate  =  (data: Element, filter: string) => data.name.indexOf(filter) != -1;
   }
-  async printComponent(cmpName: any) {
-    this.printB = false;
-    await new Promise(f => setTimeout(f, 1000));
+  async printComponent(content: any) {
+    // this.printB = false;
+    console.log(content);
+
+    if (typeof content === 'string') {
+
+      this.pdf.batch({orders : this.selection.selected}).subscribe((response) => {
+        var mediaType = 'application/pdf';
+        var blob = new Blob([response], { type: mediaType });
+        saveAs(blob, 'multiple.pdf');
+    },
+        (error) => {
+          console.log(error);
+         });
+    } else {
+      console.log("single file");
+
+      this.pdf.pdf({order:content}).subscribe((response) => {
+        var mediaType = 'application/pdf';
+        var blob = new Blob([response], { type: mediaType });
+        saveAs(blob, content.id + '.pdf');
+    },
+        (error) => {
+          console.log(error);
+         });
+    }
+
+    // await new Promise((f) => setTimeout(f, 1000));
     console.log('pcccccccccc');
+  }
 
-    this.t2p.captureScreen();
-    // let printContents = document.getElementById(cmpName)!.innerHTML;
-    // let originalContents = document.body.innerHTML;
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
 
-    // document.body.innerHTML = printContents;
-
-    // window.print();
-
-    // document.body.innerHTML = originalContents;
-    // window.location.reload();
-     this.printB = true;
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.dataSource.data.forEach((row) => this.selection.select(row));
+    console.log(this.selection);
+  }
 }
-}
-
-
-/** Builds and returns a new User. */
-// function createNewUser(id: number): UserData {
-//   const name = NAMES[Math.round(Math.random() * (NAMES.length - 1))] + ' ' +
-//     NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) + '.';
-
-//   return {
-//     id: id.toString(),
-//     name: name,
-//     progress: Math.round(Math.random() * 100).toString(),
-//     fruit: FRUITS[Math.round(Math.random() * (FRUITS.length - 1))]
-//   };
-// }
